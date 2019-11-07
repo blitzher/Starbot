@@ -7,9 +7,9 @@ from util.orientation import Orientation
 from util.vec import Vec3
 from util.pipe import RenderPipe
 
-from copy import deepcopy
+from actiomatic.action import Throttle
 
-class MyBot(BaseAgent):
+class Starbot(BaseAgent):
 
     def initialize_agent(self):
         # This runs once before the bot starts up
@@ -17,35 +17,15 @@ class MyBot(BaseAgent):
         # Fetch controller state and make a deep copy of blank controller state
         self.controller_state = SimpleControllerState()
         self.pipe = RenderPipe(self.renderer, self.logger)
+        self.logger.info("initalized")
 
         self.info = self.get_field_info()
 
-        # Get BehaviourAgent. Used to retrieve activities and controller states
-        self.BehaviourAgent = BehaviourAgent(self)
-
-        # Store relevant constant information for all behaviour agent
-        self.flipping = False
-        self.activity = None
-        info = self.get_field_info()
-
         self.pipe = RenderPipe(self.renderer, self.logger)
-
-        # Find the own and opponent goal
-        self.own_goal = info.goals[self.team]
-        self.opp_goal = info.goals[self.team + 1 % info.num_goals]
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
 
-        self.draw_ball_prediction(packet)
-
-        if not self.BehaviourAgent.activity:
-            old_activity = self.BehaviourAgent.activity.__class__.__name__
-            self.BehaviourAgent.get_activity(packet)
-            new_activity = self.BehaviourAgent.activity.__class__.__name__
-
-        self.controller_state = self.BehaviourAgent.get_controller_state(packet)
-
-        self.pipe.render()
+        self.controller_state.throttle = 0
 
         return self.controller_state
 
