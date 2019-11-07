@@ -16,15 +16,4 @@ class Const:
 
         self.angular_threshold = np.pi / 1
 
-        self.neutral    = ( 0, 0, 0)
-
-        self.forward    = (-1, 0, 0)
-        self.backwards  = ( 1, 0, 0)
-
-        self.right      = ( 0, 1, 0)
-        self.left       = ( 0,-1, 0)
-
-        self.up         = ( 0, 0, 1)
-        self.down       = ( 0, 0,-1)
-
 consts = Const()

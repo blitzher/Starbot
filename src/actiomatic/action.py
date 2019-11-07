@@ -94,6 +94,14 @@ class Pitch(Action):
     def execute(self):
         self.agent.controller_state.pitch = self.pitch
 
+class Yaw(Action):
+    
+    def __init__(self, game_state, yaw = 0):
+        super().__init__(game_state)
+        self.yaw = yaw
+
+    def execute(self):
+        self.agent.controller_state.yaw = self.yaw
 
 
 
