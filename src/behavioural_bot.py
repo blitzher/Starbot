@@ -1,14 +1,10 @@
 import math, numpy as np
 
-from activity_behaviour import BehaviourAgent
-from constants import consts
-
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 from util.orientation import Orientation
 from util.vec import Vec3
-from util.functions import *
 from util.pipe import RenderPipe
 
 from copy import deepcopy
@@ -20,7 +16,6 @@ class MyBot(BaseAgent):
 
         # Fetch controller state and make a deep copy of blank controller state
         self.controller_state = SimpleControllerState()
-        self.blank_controller = deepcopy(self.controller_state)
         self.pipe = RenderPipe(self.renderer, self.logger)
 
         self.info = self.get_field_info()
