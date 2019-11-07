@@ -3,9 +3,12 @@ import math, numpy as np
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
+from gamestate import GameState
+
 from util.orientation import Orientation
 from util.vec import Vec3
 from util.pipe import RenderPipe
+from util.constants import consts
 
 from actiomatic.action import Throttle
 
@@ -25,7 +28,10 @@ class Starbot(BaseAgent):
 
     def get_output(self, packet: GameTickPacket) -> SimpleControllerState:
 
-        self.controller_state.throttle = 0
+        game_state = GameState(packet, self)
+        full_throttle = Throttle(game_state, throttle = 1)
+
+        full_throttle.execute()
 
         return self.controller_state
 
