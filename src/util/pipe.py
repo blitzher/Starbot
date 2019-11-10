@@ -1,17 +1,3 @@
-
-
-def draw_line(renderer, point1, point2):
-    renderer.begin_rendering()
-    renderer.draw_line_3d(point1, point2, renderer.white())
-    renderer.end_rendering()
-
-def draw_debug(renderer, car, ball, action_display, *args):
-    renderer.begin_rendering()
-    # draw a line from the car to the ball
-    renderer.draw_line_3d(car.physics.location, ball.physics.location, renderer.white())
-    # print the action that the bot is taking
-    renderer.draw_string_3d(car.physics.location, 2, 2, action_display, renderer.white())
-
 class RenderPipe:
     def __init__(self, renderer, logger):
         self.renderer = renderer
@@ -19,31 +5,38 @@ class RenderPipe:
         self.tasks = []
 
     def draw_ui(self, args):
-        " RenderPipe.draw_ui  (position, text)"
-        self.renderer.draw_string_2d(args[0], args[1], 2, 2, str(args[2]), self.renderer.white())
+        " RenderPipe.draw_ui  (position, text)"        
 
-    # Rendering functions
-    def _draw_line(self, args):
-        self.renderer.draw_line_3d(args[0], args[1], self.renderer.white())
-    def _draw_text(self, args):
-        self.renderer.draw_string_3d(args[0], 2, 2, str(args[1]), self.renderer.white())
-    def _draw_polyline(self, args):
-        self.renderer.draw_polyline_3d(args[0], self.renderer.white())
+    def store_function_call(self, function, *args, **kwargs):
+        # store a function call to be called later
+        return lambda: function(*args, **kwargs)
 
-    # Wrappers
-    def draw_line(self, *args):
-        " RenderPipe.draw_line(position, text) "
-        self.add_task(self._draw_line, *args)
-    def draw_polyline(self, *args):
-        " RenderPipe.draw_text(position, text) "
-        self.add_task(self._draw_polyline, *args)
-    def draw_text(self, *args):
-        " RenderPipe.draw_text(position, text) "
+    def draw_text_2d(self, pos, text, scale = 2, colour = (255, 255, 255), alpha = 255):
+        draw_colour = self.renderer.create_color(alpha, *colour)
+        func = self.renderer.draw_string_2d
+        function_call = self.store_function_call(func, pos[0], pos[1], scale, scale, str(text), draw_colour)
+        self.add_task(function_call)
 
-        self.add_task(self._draw_text, *args)
+    def draw_text_3d(self, position, text, scale = 2, colour = (255, 255, 255), alpha = 255):
+        draw_colour = self.renderer.create_color(alpha, *colour)
+        func = self.renderer.draw_string_3d
+        function_call = self.store_function_call(func, position, scale, scale, str(text), draw_colour)
+        self.add_task(function_call)
+
+    def draw_line_3d(self, pos_1, pos_2, colour = (255, 255, 255), alpha = 255):
+        draw_colour = self.renderer.create_color(alpha, *colour)
+        func = self.renderer.draw_line_3d
+        function_call = self.store_function_call(func, pos_1, pos_2, draw_colour)
+        self.add_task(function_call)
+
+    def draw_polyline_3d(self, positions, colour = (255, 255, 255), alpha = 255):
+        draw_colour = self.renderer.create_color(alpha, *colour)
+        func = self.renderer.draw_polyline_3d
+        function_call = self.store_function_call(func, positions, draw_colour)
+        self.add_task(function_call)
 
 
-    def add_task(self, *task):
+    def add_task(self, task):
         " RenderPipe.add_task(RenderPipe.add_task(task, *args) "
         self.tasks.append(task)
 
@@ -51,7 +44,7 @@ class RenderPipe:
         self.renderer.begin_rendering()
 
         for task in self.tasks:
-            task[0](task[1:])
+            task()
 
         self.renderer.end_rendering()
         self.tasks = []
